@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import { fileURLToPath } from "node:url";
 import { z } from "zod";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
@@ -7,8 +8,9 @@ import { auditDependency } from "./tools/auditDependency.js";
 import { verifyApi } from "./tools/verifyApi.js";
 import { getKnowledge } from "./tools/getKnowledge.js";
 import { fileKnowledgeStore } from "./knowledge/store.js";
+import { fetchLatestLtsNode } from "./registry/node.js";
 
-const KNOWLEDGE_PATH = process.env.SEOS_KNOWLEDGE_PATH ?? "./knowledge.json";
+const KNOWLEDGE_PATH = process.env.SEOS_KNOWLEDGE_PATH ?? fileURLToPath(new URL("../knowledge.json", import.meta.url));
 
 const server = new McpServer({ name: "seos-knowledge", version: "0.1.0" });
 
@@ -44,7 +46,7 @@ server.tool(
   "Verify that a package exports a given symbol path",
   {
     package: z.string(),
-    symbolPath: z.string(),
+    symbolPath: z.string().min(1),
   },
   async ({ package: pkg, symbolPath }) => {
     const result = await verifyApi(pkg, symbolPath);
@@ -59,10 +61,8 @@ server.tool(
     const result = await getKnowledge(
       fileKnowledgeStore(KNOWLEDGE_PATH),
       async (names) =>
-        (await checkVersions(names.map((name) => ({ name })))).map((c) => ({
-          name: c.name,
-          latest: c.latest,
-        })),
+        (await checkVersions(names.map((name) => ({ name })))).map((c) => ({ name: c.name, latest: c.latest, status: c.status })),
+      () => fetchLatestLtsNode(),
     );
     return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
   },

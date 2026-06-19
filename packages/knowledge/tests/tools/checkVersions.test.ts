@@ -34,4 +34,14 @@ describe("checkVersions", () => {
     const [result] = await checkVersions([{ name: "does-not-exist" }], fakeNpm);
     expect(result.status).toBe("unknown");
   });
+
+  it("marks a satisfied range as ok", async () => {
+    const [result] = await checkVersions([{ name: "prisma", requested: "^8.0.0" }], fakeNpm);
+    expect(result.status).toBe("ok");
+  });
+
+  it("marks an unsatisfied range as outdated", async () => {
+    const [result] = await checkVersions([{ name: "prisma", requested: "^5.0.0" }], fakeNpm);
+    expect(result.status).toBe("outdated");
+  });
 });

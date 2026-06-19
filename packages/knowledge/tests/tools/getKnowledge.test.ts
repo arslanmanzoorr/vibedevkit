@@ -20,11 +20,15 @@ const versionChecker = async (names: string[]) =>
     status: "ok" as const,
   }));
 
+const runtimeChecker = async () => "24";
+
 describe("getKnowledge", () => {
   it("returns the curated profile enriched with live latest versions", async () => {
-    const result = await getKnowledge(store, versionChecker);
+    const result = await getKnowledge(store, versionChecker, runtimeChecker);
     expect(result.framework).toBe("Next.js");
     expect(result.packages.find((p) => p.name === "next")?.latest).toBe("17.0.0");
     expect(result.packages.find((p) => p.name === "prisma")?.latest).toBe("8.0.0");
+    expect(result.latestLtsRuntime).toBe("24");
+    expect(result.packages.find((p) => p.name === "next")?.status).toBe("ok");
   });
 });

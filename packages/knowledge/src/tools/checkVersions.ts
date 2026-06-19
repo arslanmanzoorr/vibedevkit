@@ -1,3 +1,4 @@
+import semver from "semver";
 import type { VersionCheck } from "../types.js";
 import { fetchPackageInfo, type PackageInfo } from "../registry/npm.js";
 
@@ -30,7 +31,14 @@ export async function checkVersions(
             reason: `${name} is deprecated on the registry`,
           };
         }
-        const status = requested && requested !== info.latest ? "outdated" : "ok";
+        let status: "ok" | "outdated" = "ok";
+        if (requested) {
+          if (semver.validRange(requested) !== null) {
+            status = semver.satisfies(info.latest, requested, { includePrerelease: true }) ? "ok" : "outdated";
+          } else {
+            status = requested !== info.latest ? "outdated" : "ok";
+          }
+        }
         return {
           name,
           requested,
