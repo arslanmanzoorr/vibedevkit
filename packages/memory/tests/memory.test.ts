@@ -41,4 +41,11 @@ describe("history", () => {
     expect(await searchHistory(store, "outage")).toHaveLength(1);
     expect(await searchHistory(store, "bug")).toHaveLength(1); // matches type
   });
+
+  it("matches by exact kind even when the summary lacks the kind word", async () => {
+    const store = inMemoryStore();
+    await recordHistory(store, { type: "incident", summary: "DB outage on launch day", date: "2026-06-19" });
+    const hits = await searchHistory(store, "incident");
+    expect(hits).toHaveLength(1);
+  });
 });

@@ -21,8 +21,9 @@ export function jsonFileStore(path: string): MemoryStore {
       try {
         const raw = await readFile(path, "utf8");
         return JSON.parse(raw) as MemoryState;
-      } catch {
-        return emptyState();
+      } catch (err) {
+        if ((err as NodeJS.ErrnoException).code === "ENOENT") return emptyState();
+        throw err; // corrupt/unreadable file: fail loud rather than silently lose data
       }
     },
     async save(next) {

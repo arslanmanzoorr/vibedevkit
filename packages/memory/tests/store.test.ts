@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
-import { mkdtemp, rm } from "node:fs/promises";
+import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { inMemoryStore, jsonFileStore } from "../src/store.js";
@@ -40,5 +40,11 @@ describe("jsonFileStore", () => {
     await a.save(state);
     const b = jsonFileStore(path);
     expect((await b.load()).context.architecture).toBe("modular monolith");
+  });
+
+  it("throws on a corrupt (non-JSON) file rather than silently returning empty state", async () => {
+    const path = join(dir, "corrupt.json");
+    await writeFile(path, "this is not json{", "utf8");
+    await expect(jsonFileStore(path).load()).rejects.toThrow();
   });
 });

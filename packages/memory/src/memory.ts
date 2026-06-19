@@ -1,3 +1,6 @@
+// NOTE: operations follow load -> modify -> save against the injected store.
+// The jsonFileStore has no locking, so truly concurrent tool calls are last-write-wins.
+// MCP clients serialize tool calls, so this is acceptable for the current single-writer usage.
 import type { ContextRecord, DecisionRecord, HistoryKind, HistoryRecord, MemoryStore } from "./types.js";
 
 const KINDS: HistoryKind[] = ["bug", "incident", "bottleneck"];
