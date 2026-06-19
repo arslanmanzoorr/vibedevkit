@@ -1,0 +1,6 @@
+{
+  "framework": "Next.js",
+  "runtime": "Node",
+  "orm": "Prisma",
+  "recommendedPackages": ["next", "prisma", "zod"]
+}
