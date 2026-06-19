@@ -7,7 +7,7 @@ interface SecretRule {
 }
 
 const SECRET_RULES: SecretRule[] = [
-  { rule: "openai-api-key", severity: "critical", regex: /sk-[A-Za-z0-9]{20,}/ },
+  { rule: "openai-api-key", severity: "critical", regex: /sk-[A-Za-z0-9-]{20,}/ },
   { rule: "aws-access-key-id", severity: "critical", regex: /AKIA[0-9A-Z]{16}/ },
   { rule: "private-key", severity: "critical", regex: /-----BEGIN (?:RSA |EC )?PRIVATE KEY-----/ },
   {
@@ -18,7 +18,8 @@ const SECRET_RULES: SecretRule[] = [
 ];
 
 export function isFrontendPath(path: string): boolean {
-  return /(?:\.(?:jsx|tsx)$)|(?:^|\/)(?:components|pages|public|app|client)(?:\/|$)/.test(path);
+  const p = path.replace(/\\/g, "/");
+  return /(?:\.(?:jsx|tsx)$)|(?:^|\/)(?:components|pages|public|app|client)(?:\/|$)/.test(p);
 }
 
 export function scanSecrets(files: SourceFile[]): Finding[] {

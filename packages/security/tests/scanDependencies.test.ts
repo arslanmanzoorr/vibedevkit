@@ -30,4 +30,9 @@ describe("scanVulnerabilities", () => {
     const vulns = await scanVulnerabilities([{ name: "x", version: "1.0.0" }], fetchFn);
     expect(vulns[0].severity).toBe("medium");
   });
+
+  it("throws on a non-ok OSV response instead of reporting no vulnerabilities", async () => {
+    const failing = (async () => ({ ok: false, status: 503, json: async () => ({}) }) as Response) as unknown as typeof fetch;
+    await expect(scanVulnerabilities([{ name: "x", version: "1.0.0" }], failing)).rejects.toThrow("503");
+  });
 });

@@ -28,7 +28,9 @@ async function queryOsv(dep: DependencyRef, fetchFn: FetchFn): Promise<Vulnerabi
     headers: { "content-type": "application/json" },
     body: JSON.stringify({ version: dep.version, package: { name: dep.name, ecosystem: "npm" } }),
   });
-  if (!res.ok) return [];
+  if (!res.ok) {
+    throw new Error(`OSV query failed for ${dep.name}@${dep.version}: HTTP ${res.status}`);
+  }
   const body = (await res.json()) as { vulns?: OsvVuln[] };
   return (body.vulns ?? []).map((v) => ({
     package: dep.name,

@@ -30,4 +30,20 @@ describe("scanSecrets", () => {
   it("returns no findings for clean content", () => {
     expect(scanSecrets([{ path: "server/clean.ts", content: "const x = 1;" }])).toEqual([]);
   });
+
+  it("detects the sk-proj- key format", () => {
+    const f = scanSecrets([{ path: "server/x.ts", content: "const k = 'sk-proj-abcdefghijklmnopqrstuvwxyz0123';" }]);
+    expect(f.some((x) => x.rule === "openai-api-key")).toBe(true);
+  });
+
+  it("classifies a Windows-style frontend path", () => {
+    const f = scanSecrets([{ path: "app\\components\\Chat.tsx", content: "const k = 'sk-abcdefghijklmnopqrstuvwxyz0123';" }]);
+    expect(f.some((x) => x.rule === "secret-in-frontend")).toBe(true);
+  });
+
+  it("does NOT escalate a backend-path secret to secret-in-frontend", () => {
+    const f = scanSecrets([{ path: "server/config.ts", content: "const k = 'sk-abcdefghijklmnopqrstuvwxyz0123';" }]);
+    expect(f.some((x) => x.rule === "secret-in-frontend")).toBe(false);
+    expect(f.some((x) => x.rule === "openai-api-key")).toBe(true);
+  });
 });
