@@ -46,4 +46,9 @@ describe("writeAdr", () => {
     const files = (await readdir(dir)).sort();
     expect(files).toEqual(["0001-first.md", "0002-second.md"]);
   });
+
+  it("falls back to 'untitled' when the decision has no slug-able characters", async () => {
+    const path = await writeAdr({ decision: "!!!", reason: "edge", date: "2026-06-19" }, dir);
+    expect(path).toContain("0001-untitled.md");
+  });
 });

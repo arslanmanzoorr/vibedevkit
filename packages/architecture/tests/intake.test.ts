@@ -36,4 +36,18 @@ describe("intake", () => {
   it("throws when regions < 1", () => {
     expect(() => intake({ ...base, expectedRegions: 0 })).toThrow();
   });
+
+  it("classifies user-tier boundaries correctly", () => {
+    expect(intake({ ...base, expectedUsers: 9_999 }).scale).toBe("small");
+    expect(intake({ ...base, expectedUsers: 10_000 }).scale).toBe("medium");
+    expect(intake({ ...base, expectedUsers: 999_999 }).scale).toBe("medium");
+    expect(intake({ ...base, expectedUsers: 1_000_000 }).scale).toBe("large");
+  });
+
+  it("classifies rps-tier boundaries correctly", () => {
+    expect(intake({ ...base, expectedRequestsPerSecond: 49 }).scale).toBe("small");
+    expect(intake({ ...base, expectedRequestsPerSecond: 50 }).scale).toBe("medium");
+    expect(intake({ ...base, expectedRequestsPerSecond: 999 }).scale).toBe("medium");
+    expect(intake({ ...base, expectedRequestsPerSecond: 1_000 }).scale).toBe("large");
+  });
 });

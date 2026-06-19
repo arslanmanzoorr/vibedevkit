@@ -48,4 +48,14 @@ describe("generateArchitecture", () => {
     const p = generateArchitecture(profile({ scale: "large", expectedRequestsPerSecond: 1500, multiRegion: true, expectedRegions: 2 }));
     expect(p.rationale.length).toBe(5);
   });
+
+  it("applies the worker heuristic at the rps boundary", () => {
+    expect(generateArchitecture(profile({ expectedRequestsPerSecond: 99 })).services).not.toContain("worker");
+    expect(generateArchitecture(profile({ expectedRequestsPerSecond: 100 })).services).toContain("worker");
+  });
+
+  it("applies the cache heuristic at the rps boundary", () => {
+    expect(generateArchitecture(profile({ expectedRequestsPerSecond: 999 })).datastore.cache).toBeUndefined();
+    expect(generateArchitecture(profile({ expectedRequestsPerSecond: 1_000 })).datastore.cache).toBe("Redis");
+  });
 });

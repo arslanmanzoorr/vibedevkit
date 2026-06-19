@@ -13,10 +13,10 @@ const ADR_DIR = process.env.SEOS_ADR_DIR ?? "docs/adr";
 const server = new McpServer({ name: "seos-architecture", version: "0.1.0" });
 
 const requirementsShape = {
-  expectedUsers: z.number().nonnegative(),
-  expectedRequestsPerSecond: z.number().nonnegative(),
-  expectedDataSizeGb: z.number().nonnegative(),
-  expectedRegions: z.number().int().min(1),
+  expectedUsers: z.coerce.number().nonnegative(),
+  expectedRequestsPerSecond: z.coerce.number().nonnegative(),
+  expectedDataSizeGb: z.coerce.number().nonnegative(),
+  expectedRegions: z.coerce.number().int().min(1),
 };
 
 const proposalShape = {
@@ -38,10 +38,10 @@ server.tool(
 
 server.tool(
   "generate_architecture",
-  "Generate a deterministic architecture proposal (services, datastore, deployment model, rationale) from a requirements profile.",
-  { ...requirementsShape, scale: z.enum(["small", "medium", "large"]), multiRegion: z.boolean() },
-  async (profile) => {
-    const proposal = generateArchitecture(profile);
+  "Derive a scale profile from raw requirements and generate a deterministic architecture proposal (services, datastore, deployment model, rationale).",
+  requirementsShape,
+  async (answers) => {
+    const proposal = generateArchitecture(intake(answers));
     return { content: [{ type: "text", text: JSON.stringify(proposal, null, 2) }] };
   },
 );

@@ -30,7 +30,7 @@ export async function writeAdr(record: AdrRecord, dir = "docs/adr"): Promise<str
   await mkdir(dir, { recursive: true });
   const n = await nextAdrNumber(dir);
   const num = String(n).padStart(4, "0");
-  const slug = slugify(record.decision);
+  const slug = slugify(record.decision) || "untitled";
   const status = record.status ?? "accepted";
   const path = resolve(join(dir, `${num}-${slug}.md`));
 
@@ -50,6 +50,6 @@ export async function writeAdr(record: AdrRecord, dir = "docs/adr"): Promise<str
     "",
   ].join("\n");
 
-  await writeFile(path, body, "utf8");
+  await writeFile(path, body, { encoding: "utf8", flag: "wx" });
   return path;
 }
