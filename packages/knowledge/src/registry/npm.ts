@@ -24,8 +24,14 @@ export async function fetchPackageInfo(name: string, fetchFn: FetchFn = fetch): 
 }
 
 export async function fetchWeeklyDownloads(name: string, fetchFn: FetchFn = fetch): Promise<number> {
+  // 404 means the package has no download stats (unknown/new) -> 0.
+  // Other non-ok statuses (5xx, rate limits) throw rather than masquerade as 0 downloads,
+  // which would otherwise silently inflate dependency risk scores downstream.
   const res = await fetchFn(`https://api.npmjs.org/downloads/point/last-week/${encodeURIComponent(name)}`);
-  if (!res.ok) return 0;
+  if (!res.ok) {
+    if (res.status === 404) return 0;
+    throw new Error(`npm downloads API returned ${res.status} for ${name}`);
+  }
   const body = (await res.json()) as { downloads?: number };
   return body.downloads ?? 0;
 }

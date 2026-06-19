@@ -10,6 +10,10 @@ function stubFetch(body: unknown, ok = true): typeof fetch {
     }) as Response) as unknown as typeof fetch;
 }
 
+function stubFetchStatus(status: number, body: unknown = {}): typeof fetch {
+  return (async () => ({ ok: status >= 200 && status < 300, status, json: async () => body }) as Response) as unknown as typeof fetch;
+}
+
 describe("fetchPackageInfo", () => {
   it("returns latest version, deprecation, and last publish date", async () => {
     const now = new Date().toISOString();
@@ -37,6 +41,10 @@ describe("fetchPackageInfo", () => {
     );
     expect(info.deprecated).toBe(true);
   });
+
+  it("throws when the registry returns a non-ok status", async () => {
+    await expect(fetchPackageInfo("nonexistent", stubFetchStatus(404))).rejects.toThrow("404");
+  });
 });
 
 describe("fetchWeeklyDownloads", () => {
@@ -48,5 +56,9 @@ describe("fetchWeeklyDownloads", () => {
   it("returns 0 when the package is unknown", async () => {
     const n = await fetchWeeklyDownloads("nope-not-real", stubFetch({}, false));
     expect(n).toBe(0);
+  });
+
+  it("throws on a 5xx error instead of returning 0", async () => {
+    await expect(fetchWeeklyDownloads("prisma", stubFetchStatus(503))).rejects.toThrow("503");
   });
 });
