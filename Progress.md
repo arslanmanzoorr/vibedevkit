@@ -7,7 +7,7 @@
 | | |
 |---|---|
 | **Project** | AI Software Engineering Operating System (AI-SEOS) |
-| **Current stage** | ✅ Phases 1, 2, 3, 4, 5, 7 COMPLETE — six runnable MCP servers shipped (101 tests). Phases 6, 8, 9, 10 awaiting expansion |
+| **Current stage** | ✅ Phases 1–8 COMPLETE — eight runnable MCP servers shipped (121 tests). Phases 9 & 10 awaiting expansion |
 | **Plan** | [2026-06-19-engineering-os.md](2026-06-19-engineering-os.md) |
 | **Repo state** | Git repo initialized; commits landing per task |
 | **Tech stack** | TypeScript · Node 24 · `@modelcontextprotocol/sdk` · Zod · Vitest · tsup · pnpm workspaces |
@@ -21,11 +21,13 @@ Phase 2    ████████████████████  100%  (
 Phase 3    ████████████████████  100%  (@seos/security;     22 tests green)
 Phase 4    ████████████████████  100%  (@seos/qa;           10 tests green)
 Phase 5    ████████████████████  100%  (@seos/performance;   8 tests green)
+Phase 6    ████████████████████  100%  (@seos/devops;        8 tests green)
 Phase 7    ████████████████████  100%  (@seos/memory;        8 tests green)
-Phases 6,8,9,10 ░░░░░░░░░░░░░░░░   0%   (sub-plans only, not expanded)
+Phase 8    ████████████████████  100%  (@seos/review-board; 12 tests green)
+Phases 9,10 ░░░░░░░░░░░░░░░░░░░░   0%   (sub-plans only, not expanded)
 ```
 
-**Repo total: 6 MCP servers · 101 tests green on `main`.**
+**Repo total: 8 MCP servers · 121 tests green on `main`.**
 
 ---
 
@@ -40,11 +42,11 @@ Phases 6,8,9,10 ░░░░░░░░░░░░░░░░   0%   (sub-pla
 
 ## In progress
 
-- _Nothing currently being implemented._ Six servers shipped (Phases 1–5, 7).
+- _Nothing currently being implemented._ Eight servers shipped (Phases 1–8).
 
 ## Not started
 
-- Phases 6 (DevOps), 8 (Review Board), 9 (Self-Healing), 10 (Compliance) — sub-plans pending expansion. Phase 8 composes 3/4/5/6; Phase 9 depends on 6/8.
+- Phases 9 (Self-Healing), 10 (Compliance) — sub-plans pending expansion. Phase 9 depends on 6/8 (both now shipped).
 
 ---
 
@@ -145,6 +147,34 @@ Plan: [docs/superpowers/plans/2026-06-19-phase5-performance.md](docs/superpowers
 
 ---
 
+## Phase 6 — `@seos/devops`
+
+Plan: [docs/superpowers/plans/2026-06-19-phase6-devops.md](docs/superpowers/plans/2026-06-19-phase6-devops.md).
+
+| Tool | Purpose |
+|------|---------|
+| `generate_infra` | Dockerfile (node-slim, EXPOSE, HEALTHCHECK), GitHub Actions CI YAML, `/health` path |
+| `generate_observability` | Logging (pino), metrics (prom-client + `/metrics`), tracing (OpenTelemetry) scaffolding |
+| `check_reliability` | Reports which of backup/restore/rollback strategies are missing (empty string = missing) |
+
+**Result:** 8 tests passing, builds + stdio smoke (3 tools). Generators emit conventional templated scaffolding, not provider-specific IaC (documented v0.1 baseline).
+
+---
+
+## Phase 8 — `@seos/review-board`
+
+Plan: [docs/superpowers/plans/2026-06-19-phase8-review-board.md](docs/superpowers/plans/2026-06-19-phase8-review-board.md).
+
+| Tool | Purpose |
+|------|---------|
+| `review_pr` | Runs the multi-agent board over a PR; approves only when no agent rejects; records every vote + recommendations |
+
+Built around a `ReviewAgent` interface (the integration seam) + `runBoard` aggregation, with three self-contained reference agents: **documentation** (code PR needs docs or a description), **security-secrets** (rejects on sk-/AKIA/private-key), **large-file** (>50,000 chars). The sibling servers expose no library exports (their `main` is the stdio entry), so the board doesn't import them — production can add Architecture/QA/Performance/DevOps agents via the interface (documented follow-up).
+
+**Result:** 12 tests passing, builds + stdio smoke (`review_pr`). Hardening `01d1e31`: anchored the README match so a code file merely containing "readme" in its name isn't mistaken for docs.
+
+---
+
 ## Phases 2-10 — sub-plan status
 
 | Phase | Subsystem | Package | Sub-plan written | Expanded to TDD | Built |
@@ -153,9 +183,9 @@ Plan: [docs/superpowers/plans/2026-06-19-phase5-performance.md](docs/superpowers
 | 3 | Security | `@seos/security` | ✅ | ✅ | ✅ |
 | 4 | Quality Assurance | `@seos/qa` | ✅ | ✅ | ✅ |
 | 5 | Performance | `@seos/performance` | ✅ | ✅ | ✅ |
-| 6 | DevOps | `@seos/devops` | ✅ | ⬜ | ⬜ |
+| 6 | DevOps | `@seos/devops` | ✅ | ✅ | ✅ |
 | 7 | Engineering Memory | `@seos/memory` | ✅ | ✅ | ✅ |
-| 8 | Multi-Agent Review Board | `@seos/review-board` | ✅ | ⬜ | ⬜ |
+| 8 | Multi-Agent Review Board | `@seos/review-board` | ✅ | ✅ | ✅ |
 | 9 | Self-Healing | `@seos/self-healing` | ✅ | ⬜ | ⬜ |
 | 10 | Enterprise / Compliance | `@seos/compliance` | ✅ | ⬜ | ⬜ |
 
@@ -213,3 +243,6 @@ Plan: [docs/superpowers/plans/2026-06-19-phase5-performance.md](docs/superpowers
 - **2026-06-19** — Dispatched Phases 4 & 5 as parallel worktree agents, but their worktree base predated the plan commit → both improvised from the coarse sub-spec and diverged from the reviewed contracts (final reviews flagged contract mismatches + a real N+1 brace-counting bug in Phase 5). **Discarded both worktree branches.**
 - **2026-06-19** — Rebuilt Phases 4 & 5 directly on `main` from the detailed plans (one sequential agent, verbatim TDD). Agent caught a real bug in the plan's N+1 regex (`\bfind\b` can't match `findMany`) and fixed it via longest-first alternation. `@seos/qa` (10 tests) + `@seos/performance` (8 tests).
 - **2026-06-19** — ✅ **Phases 4 & 5 complete.** Repo total: **6 MCP servers, 101 tests green** on `main`. Root README updated (4 & 5 → shipped, registration blocks added).
+- **2026-06-19** — Expanded Phase 6 (DevOps) + Phase 8 (Review Board) into detailed TDD plans (`03f4929`). Built both sequentially on `main` (verbatim TDD). `@seos/devops` (8 tests); `@seos/review-board` (11 tests). Phase 8 designed around a `ReviewAgent` interface rather than importing siblings (they expose no library exports).
+- **2026-06-19** — Final review of both. `@seos/devops` ready as-is. `@seos/review-board` hardening `01d1e31`: anchored the documentation agent's README regex (the `readme` substring over-matched code filenames) → 12 tests.
+- **2026-06-19** — ✅ **Phases 6 & 8 complete.** Repo total: **8 MCP servers, 121 tests green** on `main`.

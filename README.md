@@ -23,9 +23,9 @@ The build is organized as a 10-phase program (see [`docs/superpowers/plans/2026-
 | 3 | [`@seos/security`](packages/security) | ✅ shipped | `scan_secrets`, `scan_dependencies`, `scan_code`, `threat_model` |
 | 4 | [`@seos/qa`](packages/qa) | ✅ shipped | `generate_tests`, `check_coverage`, `detect_regressions` |
 | 5 | [`@seos/performance`](packages/performance) | ✅ shipped | `analyze_backend`, `analyze_frontend`, `simulate_load` |
-| 6 | `@seos/devops` | ⬜ planned | infra/observability/reliability generators |
+| 6 | [`@seos/devops`](packages/devops) | ✅ shipped | `generate_infra`, `generate_observability`, `check_reliability` |
 | 7 | [`@seos/memory`](packages/memory) | ✅ shipped | `record_decision`, `query_decisions`, `set_context`, `get_context`, `record_history`, `search_history` |
-| 8 | `@seos/review-board` | ⬜ planned | multi-agent PR review board |
+| 8 | [`@seos/review-board`](packages/review-board) | ✅ shipped | `review_pr` (multi-agent board) |
 | 9 | `@seos/self-healing` | ⬜ planned | monitor → root-cause → fix → PR |
 | 10 | `@seos/compliance` | ⬜ planned | SOC2 / GDPR / HIPAA / PCI + audit log |
 
@@ -36,6 +36,8 @@ The build is organized as a 10-phase program (see [`docs/superpowers/plans/2026-
 - **`@seos/security`** — automatic security review. Secret scanning (with frontend-leak escalation), live CVE lookups via [OSV.dev](https://osv.dev), static injection/XSS/eval detection, and threat modeling.
 - **`@seos/qa`** — automated QA gates. Generates Vitest skeletons from a file's real exported symbols, enforces a coverage threshold, and detects regressions between two test runs.
 - **`@seos/performance`** — catches scaling problems early. Detects backend N+1 queries and `SELECT *`, flags oversized frontend bundles against a budget, and runs a staged load simulation with an injectable runner.
+- **`@seos/devops`** — SRE practices for solo founders. Generates deployment infrastructure (Dockerfile, CI pipeline, health check), observability scaffolding (logging/metrics/tracing), and checks reliability readiness (backup/restore/rollback).
+- **`@seos/review-board`** — a multi-agent PR review board. Reference agents (documentation, secret-scan, large-file) each vote approve/reject; a PR is approved only when none reject. Extensible via a `ReviewAgent` interface.
 - **`@seos/memory`** — persistent institutional memory. Decisions, project context, and historical bugs/incidents/bottlenecks that survive across sessions, behind a swappable store interface.
 
 ## Requirements
@@ -79,6 +81,14 @@ Add the servers you want to your MCP config (e.g. `.mcp.json` or your Claude Cod
       "command": "node",
       "args": ["./packages/performance/dist/index.js"]
     },
+    "seos-devops": {
+      "command": "node",
+      "args": ["./packages/devops/dist/index.js"]
+    },
+    "seos-review-board": {
+      "command": "node",
+      "args": ["./packages/review-board/dist/index.js"]
+    },
     "seos-memory": {
       "command": "node",
       "args": ["./packages/memory/dist/index.js"],
@@ -100,7 +110,9 @@ engineering-os/
     security/       # Phase 3
     qa/             # Phase 4
     performance/    # Phase 5
+    devops/         # Phase 6
     memory/         # Phase 7
+    review-board/   # Phase 8
   docs/
     superpowers/plans/   # the program plan + per-phase implementation plans
     adr/                 # Architecture Decision Records (written by @seos/architecture)
@@ -121,4 +133,4 @@ Each phase is expanded into a complete TDD implementation plan, then executed ta
 
 ## Status & roadmap
 
-See [`Progress.md`](Progress.md) for the live tracker, decisions log, and the list of documented v0.1 gaps deferred to later iterations. Phases 6, 8, 9, and 10 are specified as sub-plans in the program plan and will each be expanded into a full implementation plan when built.
+See [`Progress.md`](Progress.md) for the live tracker, decisions log, and the list of documented v0.1 gaps deferred to later iterations. Phases 9 (Self-Healing) and 10 (Compliance) are specified as sub-plans in the program plan and will each be expanded into a full implementation plan when built.
