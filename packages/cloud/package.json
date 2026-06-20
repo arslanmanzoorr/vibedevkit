@@ -1,0 +1,37 @@
+{
+  "name": "@seos/cloud",
+  "version": "0.1.0",
+  "type": "module",
+  "bin": { "seos-cloud": "dist/index.js" },
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsup src/index.ts --format esm --clean",
+    "start": "node dist/index.js",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "@seos/context": "workspace:*",
+    "@seos/knowledge": "workspace:*",
+    "@seos/architecture": "workspace:*",
+    "@seos/security": "workspace:*",
+    "@seos/qa": "workspace:*",
+    "@seos/performance": "workspace:*",
+    "@seos/devops": "workspace:*",
+    "@seos/memory": "workspace:*",
+    "@seos/review-board": "workspace:*",
+    "@seos/self-healing": "workspace:*",
+    "@seos/compliance": "workspace:*",
+    "express": "^4.19.0",
+    "zod": "^3.23.0"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^22.0.0",
+    "@types/supertest": "^6.0.0",
+    "supertest": "^7.0.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.5.0",
+    "vitest": "^2.0.0"
+  }
+}
