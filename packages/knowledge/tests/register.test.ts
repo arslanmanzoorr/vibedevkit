@@ -8,6 +8,7 @@ describe("knowledge registerTools", () => {
     const names: string[] = [];
     const server = new McpServer({ name: "test", version: "0" });
     const orig = server.tool.bind(server);
+    // McpServer.tool is overloaded; cast to any to intercept registration without reimplementing all overloads.
     (server as any).tool = (name: string, ...rest: unknown[]) => {
       names.push(name);
       return (orig as any)(name, ...rest);

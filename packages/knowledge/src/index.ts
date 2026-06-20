@@ -7,10 +7,11 @@ import type { ToolContext } from "@seos/context";
 import { registerTools } from "./register.js";
 
 // Preserve the prior local default: knowledge.json sits next to the built file.
+const base = localContext();
 const ctx: ToolContext = {
-  ...localContext(),
+  ...base,
   paths: {
-    ...localContext().paths,
+    ...base.paths,
     knowledge: process.env.SEOS_KNOWLEDGE_PATH ?? fileURLToPath(new URL("../knowledge.json", import.meta.url)),
   },
 };
