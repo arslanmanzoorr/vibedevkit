@@ -1,7 +1,7 @@
 import type { PullRequest, ReviewAgent, Vote } from "./types.js";
 
 const CODE = /\.(?:ts|tsx|js|jsx)$/;
-const DOC = /(?:readme)|(?:\.md$)|(?:(?:^|\/)docs\/)/i;
+const DOC = /(?:(?:^|\/)readme(?:\.[^/]*)?$)|(?:\.md$)|(?:(?:^|\/)docs\/)/i;
 const SECRET = /sk-[A-Za-z0-9-]{20,}|AKIA[0-9A-Z]{16}|-----BEGIN (?:RSA |EC )?PRIVATE KEY-----/;
 const MAX_FILE_CHARS = 50_000;
 

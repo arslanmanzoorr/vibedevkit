@@ -14,6 +14,10 @@ describe("documentationAgent", () => {
     const v = documentationAgent.review({ files: [{ path: "src/a.ts", content: "x" }], description: "explains the change" });
     expect(v.vote).toBe("approve");
   });
+  it("does not treat a code file that merely contains 'readme' in its name as documentation", () => {
+    const v = documentationAgent.review({ files: [{ path: "src/readme-parser.ts", content: "x" }] });
+    expect(v.vote).toBe("reject");
+  });
 });
 
 describe("secretAgent", () => {
