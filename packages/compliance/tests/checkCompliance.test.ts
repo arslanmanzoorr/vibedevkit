@@ -27,4 +27,9 @@ describe("checkCompliance", () => {
     const r = checkCompliance("pci", { encryptionInTransit: true, accessControl: true, auditLogging: true, cardholderDataIsolation: false });
     expect(r.gaps).toEqual(["cardholderDataIsolation"]);
   });
+  it("requires phiSafeguards for HIPAA", () => {
+    const r = checkCompliance("hipaa", { ...allTrue, phiSafeguards: false });
+    expect(r.compliant).toBe(false);
+    expect(r.gaps).toContain("phiSafeguards");
+  });
 });

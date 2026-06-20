@@ -17,7 +17,7 @@ export function verifyAuditLog(entries: AuditEntry[]): AuditVerifyResult {
   for (let i = 0; i < entries.length; i++) {
     const e = entries[i];
     const expectedPrev = i === 0 ? "GENESIS" : entries[i - 1].hash;
-    if (e.prevHash !== expectedPrev || e.index !== i || e.hash !== hashEntry(i, e.prevHash, e)) {
+    if (e.prevHash !== expectedPrev || e.index !== i || e.hash !== hashEntry(i, expectedPrev, e)) {
       return { valid: false, brokenAt: i };
     }
   }

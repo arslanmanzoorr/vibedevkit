@@ -24,4 +24,13 @@ describe("audit log", () => {
     expect(result.valid).toBe(false);
     expect(result.brokenAt).toBe(1);
   });
+  it("detects a deleted mid-chain entry", () => {
+    const a = appendAuditLog([], { actor: "a", action: "x", timestamp: "t1" });
+    const b = appendAuditLog([a], { actor: "b", action: "y", timestamp: "t2" });
+    const c = appendAuditLog([a, b], { actor: "c", action: "z", timestamp: "t3" });
+    const tampered = [a, c]; // middle entry removed; c.index (2) no longer matches its position (1)
+    const result = verifyAuditLog(tampered);
+    expect(result.valid).toBe(false);
+    expect(result.brokenAt).toBe(1);
+  });
 });
