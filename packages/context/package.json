@@ -9,9 +9,6 @@
     "build": "tsup src/index.ts --format esm --dts --clean",
     "test": "vitest run"
   },
-  "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.0.0"
-  },
   "devDependencies": {
     "@types/node": "^22.0.0",
     "tsup": "^8.0.0",
