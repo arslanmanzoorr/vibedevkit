@@ -98,6 +98,9 @@ importers:
       '@modelcontextprotocol/sdk':
         specifier: ^1.0.0
         version: 1.29.0(zod@3.25.76)
+      '@seos/context':
+        specifier: workspace:*
+        version: link:../context
       semver:
         specifier: ^7.8.4
         version: 7.8.4
