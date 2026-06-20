@@ -40,7 +40,7 @@ Each capability is an independent MCP server you can run on its own or compose w
 ## Installation
 
 ```bash
-git clone <your-repo-url> engineering-os
+git clone https://github.com/arslanmanzoorr/AISEOS engineering-os
 cd engineering-os
 pnpm install
 pnpm -r build
